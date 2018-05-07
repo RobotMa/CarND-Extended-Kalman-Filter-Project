@@ -39,7 +39,7 @@ void KalmanFilter::Update(const VectorXd &z) {
     * update the state by using Kalman Filter equations
   */
   VectorXd z_pred = H_*x_;
-  VectorXd y = z_pred - z;
+  VectorXd y = z - z_pred;
   MatrixXd Ht = H_.transpose();
   MatrixXd S = H_*P_*Ht + R_;
   MatrixXd K = P_*Ht*S.inverse();
@@ -61,19 +61,22 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   float py = x_(1);
   float vx = x_(2);
   float vy = x_(3);
+  
+  float c = sqrt(px*px + py*py);
+
+  if (fabs(c) < 0.0001)
+  {
+      std::cout << "Abort division by zero" << std::endl;
+      return;
+  }
 
   z_pred << sqrt(px*px + py*py),
             atan2(py, px),
             (px*vx + py*vy)/sqrt(px*px + py*py);
 
-  VectorXd y = z_pred - z;
+  VectorXd y = z - z_pred;
   MatrixXd Ht = H_.transpose();
   MatrixXd S = H_*P_*Ht + R_;
-
-  std::cout << "y is " << y << std::endl;
-  std::cout << "Ht is " << Ht << std::endl;
-  std::cout <<  "S is " << S << std::endl;
-
   MatrixXd K = P_*Ht*S.inverse();
 
   x_ = x_ + K*y;
