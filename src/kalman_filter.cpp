@@ -1,4 +1,5 @@
 #include "kalman_filter.h"
+#include<iostream>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -12,6 +13,10 @@ KalmanFilter::~KalmanFilter() {}
 
 void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
                         MatrixXd &H_in, MatrixXd &R_in, MatrixXd &Q_in) {
+
+
+  std::cout << "Size of x_in is " << x_in.size() << std::endl; 
+  std::cout << "Size of P_in is " << P_in.size() << std::endl; 
   x_ = x_in;
   P_ = P_in;
   F_ = F_in;

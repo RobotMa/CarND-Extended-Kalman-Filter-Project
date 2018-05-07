@@ -2,7 +2,7 @@
 #include <math.h>
 #include "tools.h"
 
-using Eigen::VectorXd;
+using Eigen::Vector4d;
 using Eigen::MatrixXd;
 using std::vector;
 
@@ -16,25 +16,39 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
   TODO:
     * Calculate the RMSE here.
   */
-    VectorXd vecRMSE;
-    vecRMSE << 0, 0, 0, 0;
+    Vector4d vecRMSE(0, 0, 0, 0);
     if (estimations.size() != ground_truth.size() || estimations.size() < 1 )
     {
         return vecRMSE;
     }
 
-    int n = estimations.size();
+    std::cout << "Size of estimation element is " << estimations[0].size() << std::endl;
+    std::cout << "Size of ground_truth element is " << ground_truth[0].size() << std::endl;
 
-    for(int i = 0; i < estimations[0].size(); ++i)
+    for(const auto& e : estimations)
     {
-        for(int j = 0; j < n; ++j)
-        {
-            vecRMSE[i] += (estimations[i][j] - ground_truth[i][j])*(estimations[i][j] - ground_truth[i][j]);
-        }
-        vecRMSE[i] = 1.0/double(n)*sqrt(vecRMSE[i]);
+        std::cout << "Element : " << e << std::endl;
     }
 
-    std::cout << vecRMSE << std::endl;
+
+    for(const auto& g : ground_truth)
+    {
+        std::cout << "Element : " << g << std::endl;
+    }
+
+
+    int n1 = estimations.size();
+
+    for(int i = 0; i < n1; ++i)
+    {
+        vecRMSE += estimations.at(i) - ground_truth.at(i);
+        vecRMSE = vecRMSE.array()*vecRMSE.array();
+    }
+
+    vecRMSE /= n1;
+    vecRMSE = vecRMSE.array().sqrt();
+
+    std::cout << "Final residual is " << vecRMSE << std::endl;
 
     return vecRMSE;
 

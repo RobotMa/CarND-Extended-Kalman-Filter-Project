@@ -35,6 +35,7 @@ public:
 
   /**
    * Init Initializes Kalman filter
+   * What is the point of having this function if the data members are initialized in different places of FusionEKF????
    * @param x_in Initial state
    * @param P_in Initial state covariance
    * @param F_in Transition matrix
