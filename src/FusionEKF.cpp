@@ -45,8 +45,8 @@ FusionEKF::FusionEKF() {
              0, 0, 1000, 0,
              0, 0, 0, 1000;
   ekf_.F_ = MatrixXd(4, 4);
-  ekf_.F_ << 1, 0, 0, 0,
-             0, 1, 0, 0,
+  ekf_.F_ << 1, 0, 1, 0,
+             0, 1, 0, 1,
              0, 0, 1, 0,
              0, 0, 0, 1;
 
@@ -87,6 +87,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
                  rho*sin(phi),
                  drho_dt*cos(phi),
                  drho_dt*sin(phi);
+      // hack
+      ekf_.x_(0) = fmax(ekf_.x_(0), 0.0001);
+      ekf_.x_(1) = fmax(ekf_.x_(1), 0.0001);
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       /**
@@ -98,9 +101,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
                  0;
     }
 
-    // hack
-    ekf_.x_(0) = fmax(ekf_.x_(0), 0.0001);
-    ekf_.x_(1) = fmax(ekf_.x_(1), 0.0001);
 
     previous_timestamp_ = measurement_pack.timestamp_;
     // done initializing, no need to predict or update
@@ -157,7 +157,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     ekf_.R_ = R_radar_;
     ekf_.UpdateEKF(measurement_pack.raw_measurements_);
   } 
-  else 
+  else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) 
   {
     // Laser updates
     ekf_.H_ = H_laser_;

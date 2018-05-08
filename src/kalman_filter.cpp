@@ -1,5 +1,6 @@
 #include "kalman_filter.h"
-#include<iostream>
+#include <iostream>
+#include <cmath>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -39,6 +40,7 @@ void KalmanFilter::Update(const VectorXd &z) {
     * update the state by using Kalman Filter equations
   */
   VectorXd z_pred = H_*x_;
+
   VectorXd y = z - z_pred;
   MatrixXd Ht = H_.transpose();
   MatrixXd S = H_*P_*Ht + R_;
@@ -61,20 +63,36 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   float py = x_(1);
   float vx = x_(2);
   float vy = x_(3);
-  
+
   float c = sqrt(px*px + py*py);
+  float rho_dot;
 
   if (fabs(c) < 0.0001)
   {
-      std::cout << "Abort division by zero" << std::endl;
-      return;
+      c = 0.0001;
+      rho_dot = 0;
+  } 
+  else
+  {
+      rho_dot = (px*vx + py*vy)/c;
   }
 
-  z_pred << sqrt(px*px + py*py),
-            atan2(py, px),
-            (px*vx + py*vy)/sqrt(px*px + py*py);
+  z_pred << c,
+         atan2(py, px),
+         rho_dot;
 
   VectorXd y = z - z_pred;
+
+  while(y(1) > M_PI)
+  {
+      y(1) -= 2*M_PI;
+  }
+
+  while(y(1) < -M_PI)
+  {
+      y(1) += 2*M_PI;
+  }
+
   MatrixXd Ht = H_.transpose();
   MatrixXd S = H_*P_*Ht + R_;
   MatrixXd K = P_*Ht*S.inverse();
