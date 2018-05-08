@@ -80,8 +80,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       /**
       Convert radar from polar to cartesian coordinates and initialize state.
       */
-      double rho = measurement_pack.raw_measurements_[0];
-      double phi = measurement_pack.raw_measurements_[1];
+      double rho = measurement_pack.raw_measurements_(0);
+      double phi = measurement_pack.raw_measurements_(1);
       double drho_dt = measurement_pack.raw_measurements_[2];
       ekf_.x_ << rho*cos(phi),
                  rho*sin(phi),
@@ -95,8 +95,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       /**
       Initialize state.
       */
-      ekf_.x_ << measurement_pack.raw_measurements_[0],
-                 measurement_pack.raw_measurements_[1],
+      ekf_.x_ << measurement_pack.raw_measurements_(0),
+                 measurement_pack.raw_measurements_(1),
                  0,
                  0;
     }
@@ -119,7 +119,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      * Update the process noise covariance matrix.
      * Use noise_ax = 9 and noise_ay = 9 for your Q matrix.
    */
-  float dt = (measurement_pack.timestamp_ - previous_timestamp_)/100000.0;
+  float dt = (measurement_pack.timestamp_ - previous_timestamp_)/1000000.0;
   previous_timestamp_ = measurement_pack.timestamp_;
 
   float dt_2 = dt*dt;
